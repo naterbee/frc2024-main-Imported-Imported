@@ -22,7 +22,6 @@ public class ClimberSubsystem extends SubsystemBase {
     // m_motor.restoreFactoryDefaults();
     // m_motorFollower.restoreFactoryDefaults();
     
-    // m_motorFollower.isFollower();
 
     addChild("motor", m_motor);
   }

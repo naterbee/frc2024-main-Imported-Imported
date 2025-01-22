@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.GeometryUtil;
 // import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -97,6 +98,7 @@ public class SwerveSubsystem extends SubsystemBase
       Units.inchesToMeters(4), 8.14);
 
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
+    // sending lots of data to driver station
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     try {
@@ -161,7 +163,7 @@ public class SwerveSubsystem extends SubsystemBase
     return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
   }
   public Pose2d invertIfFieldFlipped(Pose2d pose) {
-    if (isFieldFlipped()) return GeometryUtil.flipFieldPose(pose);
+    if (isFieldFlipped()) return FlippingUtil.flipFieldPose(pose);
     return pose;
   }
 
@@ -203,10 +205,9 @@ public class SwerveSubsystem extends SubsystemBase
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
-              // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
-              // Rotation PID constants
+              PathPlannerConstants.kTranslationPID,
+              PathPlannerConstants.kAnglePID
+             
           ),
           config,
           // The robot configuration
