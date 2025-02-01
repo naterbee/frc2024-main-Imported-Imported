@@ -26,7 +26,7 @@ import swervelib.SwerveDriveTest;
 import swervelib.SwerveModule;
 import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
-import frc.robot.subsystems.ElevatorSubsystem;
+ import frc.robot.subsystems.ElevatorSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -127,7 +127,7 @@ public class RobotContainer
         driveFieldOrientedAnglularVelocity);
     m_driverXbox.leftBumper().whileTrue(driveRobotOriented);
 
-    m_elevator.setDefaultCommand(m_elevator.setGoal(1));
+   // m_elevator.setDefaultCommand(m_elevator.setGoal(1));
 
     // DoubleSupplier moveArmSupplier =
     //    () -> (m_driverXbox.getLeftTriggerAxis() - m_driverXbox.getRightTriggerAxis());
@@ -171,8 +171,8 @@ public class RobotContainer
     // m_secondaryDriverXbox.leftBumper().whileTrue(m_climber.climbCommand(1));
     // m_secondaryDriverXbox.rightBumper().whileTrue(m_climber.climbCommand(-1));
 
-    m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
-    m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
+    // m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
+    // m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 

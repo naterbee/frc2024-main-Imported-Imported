@@ -74,7 +74,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 // - the current SwerveSubsystem.sysIdDriveMotorCommand is too high-level, it does all
 //   four routines in a single call, but we migth want to do it by hand for better
 //   safety control (so that the robot does not ram into anything)
-@SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase
 {
   /**
