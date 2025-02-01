@@ -32,6 +32,7 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import swervelib.math.Matter;
 
+@SuppressWarnings("unused")
 public final class Constants
 {
   public static record TwoIDs(int id1, int id2) {}
@@ -39,10 +40,10 @@ public final class Constants
   public static final class CANDeviceID {
     // CAN IDs 1-8 are taken by Swerve motors and 9-12 - by Swerve encoders
 
-    public static final TwoIDs kShootMotors = new TwoIDs(13, 14);
-    public static final int kIntakeMotor = 15;
-    public static final TwoIDs kArmMotors = new TwoIDs(16, 17);
-    public static final TwoIDs kClimberMotors = new TwoIDs(18, 19);
+    // public static final TwoIDs kShootMotors = new TwoIDs(13, 14);
+    // public static final int kIntakeMotor = 15;
+    // public static final TwoIDs kArmMotors = new TwoIDs(16, 17);
+    // public static final TwoIDs kClimberMotors = new TwoIDs(18, 19);
   }
 
   public static final class DIOPort {
@@ -59,11 +60,27 @@ public final class Constants
   }
 
   public static final class PathPlannerConstants {
-    public static final PIDConstants kTranslationPID = new PIDConstants(0.7, 0, 0);
-    public static final PIDConstants kAnglePID = new PIDConstants(0.4, 0, 0.01);
+    public static final PIDConstants kTranslationPID = new PIDConstants(5, 0, 0);
+    public static final PIDConstants kAnglePID = new PIDConstants(5, 0, 0);
     public final static LinearVelocity kMaxSpeed = MetersPerSecond.of(4);
   }
 
+  public static final class ElevatorConstants {
+
+    public static final double kElevatorkS = 0;
+    public static final double kElevatorkG = 0;
+    public static final double kElevatorkV = 0;
+    public static final double kElevatorkA = 0;
+    public static final double kElevatorGearing = 0;
+    public static final double kCarriageMass = 0;
+    public static final double kElevatorDrumRadius = 0;
+    public static final double kMinElevatorHeightMeters = 0;
+    public static final double kMaxElevatorHeightMeters = 0;
+    public static final double kElevatorKp = 0;
+    public static final double kElevatorKi = 0;
+    public static final double kElevatorKd = 0;
+
+  }
   public static final class DrivebaseConstants {
     // Hold time on motor brakes when disabled
     public static final Time kWheelLockTime = Seconds.of(10);
@@ -85,7 +102,7 @@ public final class Constants
     public static final Angle kMaxAngleBackward = Degrees.of(15);
     public static final Angle kMaxAngleForward = Degrees.of(160);
 
-    // TODO: set these before trying Trapezoid motion profile
+    
     public static final AngularVelocity kMaxVelocity = RotationsPerSecond.of(0.5);
     public static final AngularAcceleration kMaxAcceleration = 
       RotationsPerSecond.per(Second).of(1);
@@ -95,6 +112,7 @@ public final class Constants
     // from the absolute encoder (0.411 radians), resulting in the value below.
     //   offset_at_0 = vertical_angle - offset_when_vertical
     public static final Angle kArmOffset = Degrees.of(90).minus(Radians.of(0.411));
+    public static final double kArmReduction = 0;
   }
   
   public static class OperatorConstants {

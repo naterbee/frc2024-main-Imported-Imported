@@ -20,15 +20,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShootSubsystem;
 // import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.util.TunableNumber;
 import swervelib.SwerveDriveTest;
 import swervelib.SwerveModule;
 import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -39,6 +37,8 @@ import java.util.function.DoubleSupplier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+// @SuppressWarnings("unused")
+// @SuppressWarnings("unused")
 public class RobotContainer
 {
   private final SwerveSubsystem m_drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -47,6 +47,7 @@ public class RobotContainer
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_secondaryDriverXbox =
       new CommandXboxController(OperatorConstants.kSecondaryDriverControllerPort);
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
 
   TunableNumber m_angleP = new TunableNumber("Swerve/PID/ModuleAngle/P", SwerveParser.pidfPropertiesJson.angle.p);
   TunableNumber m_angleD = new TunableNumber("Swerve/PID/ModuleAngle/D", SwerveParser.pidfPropertiesJson.angle.d);
@@ -56,9 +57,6 @@ public class RobotContainer
   private SendableChooser<Command> m_autoChooser = null;
 
   // private final ArmSubsystem m_arm = new ArmSubsystem();
-  private final IntakeSubsystem m_intake = new IntakeSubsystem();
-  private final ShootSubsystem m_shoot = new ShootSubsystem();
-  private final ClimberSubsystem m_climber = new ClimberSubsystem();
 
   public RobotContainer() {
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveCommand(
@@ -114,11 +112,11 @@ public class RobotContainer
      * new Pose2d(new Translation2d(1, 1), Rotation2d.fromDegrees(0))))
      * .withName("testDriveToPose");
      */
-    Command testDriveToPose = m_drivebase.driveToRelativePose(
-      new Pose2d(new Translation2d(Meters.of(0), Meters.of(0.1)),
-                                   new Rotation2d(Degrees.of(0))))
-        /* .asProxy() */.withName("testDriveToPose");
-    addCommandToDashboard(testDriveToPose);
+    // Command testDriveToPose = m_drivebase.driveToRelativePose(
+    //   new Pose2d(new Translation2d(Meters.of(0), Meters.of(0.1)),
+    //                                new Rotation2d(Degrees.of(0))))
+    //     /* .asProxy() */.withName("testDriveToPose");
+    // addCommandToDashboard(testDriveToPose);
 
     m_drivebase.setDefaultCommand(
         // testMotors);
@@ -128,6 +126,8 @@ public class RobotContainer
         // driveFieldOrientedDirectAngleSim);
         driveFieldOrientedAnglularVelocity);
     m_driverXbox.leftBumper().whileTrue(driveRobotOriented);
+
+    m_elevator.setDefaultCommand(m_elevator.setGoal(1));
 
     // DoubleSupplier moveArmSupplier =
     //    () -> (m_driverXbox.getLeftTriggerAxis() - m_driverXbox.getRightTriggerAxis());
@@ -160,21 +160,24 @@ public class RobotContainer
     // addCommandToDashboard(armSetAngle60);
     // NamedCommands.registerCommand("armSetAngle60", armSetAngle60);
 
-    m_driverXbox.a().whileTrue(m_intake.intakeCommand(0.5));
-    m_driverXbox.b().whileTrue(m_intake.intakeCommand(-0.4));
-    m_driverXbox.y().onTrue(new SequentialCommandGroup(
-        m_shoot.shootCommand(-0.7).withTimeout(1.5),
-        (new ParallelCommandGroup(
-            m_shoot.shootCommand(-0.7),
-            m_intake.intakeCommand(1)).withTimeout(2))));
+    // m_driverXbox.a().whileTrue(m_intake.intakeCommand(0.5));
+    // m_driverXbox.b().whileTrue(m_intake.intakeCommand(-0.4));
+    // m_driverXbox.y().onTrue(new SequentialCommandGroup(
+    //     m_shoot.shootCommand(-0.7).withTimeout(1.5),
+    //     (new ParallelCommandGroup(
+    //         m_shoot.shootCommand(-0.7),
+    //         m_intake.intakeCommand(1)).withTimeout(2))));
 
-    m_secondaryDriverXbox.leftBumper().whileTrue(m_climber.climbCommand(1));
-    m_secondaryDriverXbox.rightBumper().whileTrue(m_climber.climbCommand(-1));
+    // m_secondaryDriverXbox.leftBumper().whileTrue(m_climber.climbCommand(1));
+    // m_secondaryDriverXbox.rightBumper().whileTrue(m_climber.climbCommand(-1));
+
+    m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
+    m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-    m_autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    // m_autoChooser = AutoBuilder.buildAutoChooser();
+    // SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
   private void addCommandToDashboard(Command cmd) {
@@ -211,7 +214,7 @@ public class RobotContainer
 
   public Command getAutonomousCommand() {
     // return new PathPlannerAuto("test auto");
-     return m_autoChooser.getSelected();
+    // return m_autoChooser.getSelected();
     // return drivebase.getAutonomousCommand("small path");
 
     // An example command will be run in autonomous
@@ -220,6 +223,8 @@ public class RobotContainer
     /*return new SequentialCommandGroup(
       m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(1.2)
      // drivebase.driveAtSpeed(-5, 0, 0, false).withTimeout(0.5) );*/
+    return m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(2);
+
  }
 
   public void setMotorBrake(boolean brake) {
