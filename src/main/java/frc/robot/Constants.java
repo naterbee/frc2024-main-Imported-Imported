@@ -35,15 +35,13 @@ import swervelib.math.Matter;
 @SuppressWarnings("unused")
 public final class Constants
 {
+
+  public static final double MAX_SPEED = Units.feetToMeters(14);
   public static record TwoIDs(int id1, int id2) {}
 
   public static final class CANDeviceID {
-    // CAN IDs 1-8 are taken by Swerve motors and 9-12 - by Swerve encoders
-
-    // public static final TwoIDs kShootMotors = new TwoIDs(13, 14);
-    // public static final int kIntakeMotor = 15;
-    // public static final TwoIDs kArmMotors = new TwoIDs(16, 17);
-    // public static final TwoIDs kClimberMotors = new TwoIDs(18, 19);
+    public static final int kIntakeMotor = 90;
+    public static final int kShootMotor = 100;
   }
 
   public static final class DIOPort {
@@ -86,35 +84,7 @@ public final class Constants
     public static final Time kWheelLockTime = Seconds.of(10);
   }
 
-  public static final class ArmConstants {
-    // feedforward constants
-    // public static final Voltage kS = Volts.of(0.0142);
-    // public static final Voltage kG = Volts.of(0.0225);
-    // public static final Measure<Per<Voltage, Velocity<Angle>>> kV = VoltsPerRadianPerSecond.of(0.5);
-    // public static final Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kA = VoltsPerRadianPerSecondSquared.of(0);
-
-    // PID constants
-    public static final double kP = 17;
-    public static final double kI = 0;
-    public static final double kD = 0;
-
-    // Safety limits
-    public static final Angle kMaxAngleBackward = Degrees.of(15);
-    public static final Angle kMaxAngleForward = Degrees.of(160);
-
-    
-    public static final AngularVelocity kMaxVelocity = RotationsPerSecond.of(0.5);
-    public static final AngularAcceleration kMaxAcceleration = 
-      RotationsPerSecond.per(Second).of(1);
-
-    // We measured the offset by finding a point where the arm was standing up
-    // vertically (vertical_angle = 90 degrees) and recorded the reported offset
-    // from the absolute encoder (0.411 radians), resulting in the value below.
-    //   offset_at_0 = vertical_angle - offset_when_vertical
-    public static final Angle kArmOffset = Degrees.of(90).minus(Radians.of(0.411));
-    public static final double kArmReduction = 0;
-  }
-  
+ 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kSecondaryDriverControllerPort = 1;

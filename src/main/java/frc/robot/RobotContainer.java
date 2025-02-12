@@ -128,38 +128,6 @@ public class RobotContainer
     m_driverXbox.leftBumper().whileTrue(driveRobotOriented);
 
    // m_elevator.setDefaultCommand(m_elevator.setGoal(1));
-
-    // DoubleSupplier moveArmSupplier =
-    //    () -> (m_driverXbox.getLeftTriggerAxis() - m_driverXbox.getRightTriggerAxis());
-    // m_arm.setDefaultCommand(m_arm.moveArm(moveArmSupplier));
-    // m_driverXbox.leftBumper().whileTrue(m_arm.unsafeMoveArm(moveArmSupplier));
-
-    // Command enableArm = m_arm.runEnd(
-    //   () -> m_arm.enable(),
-    //   () -> m_arm.disable()).withName("enableArm");
-    // addCommandToDashboard(enableArm);
-
-    /*
-    Command disableArm = m_arm.runOnce(
-    addCommandToDashboard(disableArm);
-*/
-
-    // TunableNumber armAngle = new TunableNumber("armAngle", 90);
-    // Command setArmAngle = m_arm.runOnce(
-    //     () -> m_arm.setGoal(Units.degreesToRadians(armAngle.get()))).withName("setArmAngle");
-    // addCommandToDashboard(setArmAngle);
-
-    // Command waitArmAtSetpoint = Commands.waitUntil(() -> m_arm.atSetpoint());
-    // waitArmAtSetpoint.addRequirements(m_arm);
-    // Command armSetAngle60 = new SequentialCommandGroup(
-    //   m_arm.runOnce(() -> m_arm.enable()),
-    //   m_arm.runOnce(() -> m_arm.setGoal(Units.degreesToRadians(60))),
-    //   waitArmAtSetpoint,
-    //   m_arm.runOnce(() -> m_arm.stop()),
-    //   m_arm.runOnce(() -> m_arm.disable())).withName("armSetAngle60");
-    // addCommandToDashboard(armSetAngle60);
-    // NamedCommands.registerCommand("armSetAngle60", armSetAngle60);
-
     // m_driverXbox.a().whileTrue(m_intake.intakeCommand(0.5));
     // m_driverXbox.b().whileTrue(m_intake.intakeCommand(-0.4));
     // m_driverXbox.y().onTrue(new SequentialCommandGroup(
