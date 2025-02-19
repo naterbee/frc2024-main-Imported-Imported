@@ -40,8 +40,9 @@ public final class Constants
   public static record TwoIDs(int id1, int id2) {}
 
   public static final class CANDeviceID {
-    public static final int kIntakeMotor = 90;
-    public static final int kShootMotor = 100;
+    public static final TwoIDs kOuttakeMotor = new TwoIDs(100, 200);
+    public static final TwoIDs elevatorMotors = new TwoIDs(40, 41);
+    
   }
 
   public static final class DIOPort {

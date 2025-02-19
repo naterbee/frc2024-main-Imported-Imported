@@ -26,6 +26,7 @@ import swervelib.SwerveDriveTest;
 import swervelib.SwerveModule;
 import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
+// import frc.robot.subsystems.OuttakeSubsystem;
 // import frc.robot.subsystems.ElevatorSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -56,7 +57,8 @@ public class RobotContainer
 
   private SendableChooser<Command> m_autoChooser = null;
 
-  // private final ArmSubsystem m_arm = new ArmSubsystem();
+  // private final OuttakeSubsystem m_outtake = new OuttakeSubsystem();
+
 
   public RobotContainer() {
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveCommand(
@@ -105,6 +107,7 @@ public class RobotContainer
         .withName("testSetAngle");
     addCommandToDashboard(testSetAngle);
 
+    // NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
     /*
      * Command testDriveToPose = drivebase.runOnce(
      * () -> drivebase.resetOdometry(new Pose2d(0, 0, new Rotation2d()))).andThen(
@@ -141,6 +144,8 @@ public class RobotContainer
 
     // m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
     // m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
+
+    // m_driverXbox.a().whileTrue(m_outtake.outtake(1));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
