@@ -8,13 +8,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.GeometryUtil;
-// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-// import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.spark.SparkMax;
 import static edu.wpi.first.units.Units.Meter;
 
@@ -33,18 +31,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
+import frc.robot.subsystems.Vision.Cameras;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.SwerveConstants;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.util.CANSparkMaxSendableAdapter;
-
+import frc.robot.subsystems.Vision;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-// import org.photonvision.PhotonCamera;
-// import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -80,6 +80,8 @@ public class SwerveSubsystem extends SubsystemBase
    * Swerve drive object.
    */
   public final SwerveDrive swerveDrive;
+  private final boolean visionDriveTest = false;
+  private Vision vision;
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -112,7 +114,11 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
 
-    // setupPathPlanner();
+    if (visionDriveTest) {
+      setupPhotonVision();
+      swerveDrive.stopOdometryThread();
+    }
+     setupPathPlanner();
 
     // 0 to 3. front left -> front right -> back left -> back right (from SverveModule.moduleNumber documentation)
     addLiveWindowModule("FL", 0);
@@ -165,6 +171,10 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose2d invertIfFieldFlipped(Pose2d pose) {
     if (isFieldFlipped()) return FlippingUtil.flipFieldPose(pose);
     return pose;
+  }
+
+  public void setupPhotonVision() {
+    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
   /**
@@ -236,7 +246,28 @@ public class SwerveSubsystem extends SubsystemBase
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
+
   }
+
+  public Command aimAtTarget(Cameras camera)
+  {
+
+    return run(() -> {
+      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+      if (resultO.isPresent())
+      {
+        var result = resultO.get();
+        if (result.hasTargets())
+        {
+          drive(getTargetSpeeds(0,
+                                0,
+                                Rotation2d.fromDegrees(result.getBestTarget()
+                                                             .getYaw()))); // Not sure if this will work, more math may be required.
+        }
+      }
+    });
+  }
+
 
   // public void setupPathPlanner()
   // { 
@@ -388,6 +419,7 @@ public class SwerveSubsystem extends SubsystemBase
         3.0, 5.0, 3.0);
   }
 
+
   /**
    * Command to characterize the robot angle motors using SysId
    *
@@ -477,6 +509,10 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    if (visionDriveTest) {
+      swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive);
+    }
   }
 
   @Override

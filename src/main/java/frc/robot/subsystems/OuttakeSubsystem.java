@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,14 +18,14 @@ import com.revrobotics.spark.SparkMax;
 
 public class OuttakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
-  private final SparkMax m_motor;
-  private final SparkMax m_motorFollower;
-  private final SparkMaxConfig config;
+  private final SparkFlex m_motor;
+  private final SparkFlex m_motorFollower;
+  private final SparkFlexConfig config;
 
   public OuttakeSubsystem() {
-    m_motor = new SparkMax(CANDeviceID.kOuttakeMotor.id1(), MotorType.kBrushless);
-    m_motorFollower = new SparkMax(CANDeviceID.kOuttakeMotor.id2(), MotorType.kBrushless);
-    config = new SparkMaxConfig();
+    m_motor = new SparkFlex(CANDeviceID.kOuttakeMotor.id1(), MotorType.kBrushless);
+    m_motorFollower = new SparkFlex(CANDeviceID.kOuttakeMotor.id2(), MotorType.kBrushless);
+    config = new SparkFlexConfig();
 
     config.follow(CANDeviceID.kOuttakeMotor.id1());
     m_motorFollower.configure(config, null, null);
