@@ -57,12 +57,12 @@ public class ElevatorSubsystem extends SubsystemBase
           ElevatorConstants.kElevatorkG,
           ElevatorConstants.kElevatorkV,
           ElevatorConstants.kElevatorkA);
-  private final SparkFlex                  m_motor      = new SparkFlex(1, MotorType.kBrushless);
-  private final SparkFlex            m_motorFollower = new SparkFlex(2, MotorType.kBrushless);
+  private final SparkMax                  m_motor      = new SparkMax(1, MotorType.kBrushless);
+  private final SparkMax            m_motorFollower = new SparkMax(2, MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
-  private final SparkFlexSim               m_motorSim   = new SparkFlexSim(m_motor, m_elevatorGearbox);
-  private final SparkFlexConfig elevatorConfig;
+  private final SparkMaxSim               m_motorSim   = new SparkMaxSim(m_motor, m_elevatorGearbox);
+  private final SparkMaxConfig elevatorConfig;
 
   
 
@@ -92,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public ElevatorSubsystem()
   {
-    SparkFlexConfig config = new SparkFlexConfig();
+    SparkMaxConfig config = new SparkMaxConfig();
     config
         .smartCurrentLimit(40)
         .closedLoopRampRate(0.25)
@@ -106,7 +106,7 @@ public class ElevatorSubsystem extends SubsystemBase
                                  .in(RPM.per(Second)));
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-    elevatorConfig = new SparkFlexConfig();
+    elevatorConfig = new SparkMaxConfig();
 
     elevatorConfig.follow(CANDeviceID.elevatorMotors.id1(), true);
     m_motorFollower.configure(config, null, null);
@@ -144,7 +144,17 @@ public class ElevatorSubsystem extends SubsystemBase
    *
    * @param goal the position to maintain
    */
-  public void reachGoal(double goal)
+  
+   public void manual (double speed) {
+    m_motor.set(speed);
+   }
+
+   public Command manualMove(double speed) {
+    return runEnd(() -> { manual(speed); },
+                  () -> { stop();});
+  }
+
+   public void reachGoal(double goal)
   {
     m_controller.setReference(Elevator.convertDistanceToRotations(Meters.of(goal)).in(Rotations),
                               ControlType.kMAXMotionPositionControl,

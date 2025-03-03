@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1m straight"
+            "pathName": "New Path"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armSetAngle60"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "1m left"
+            "name": "outtake"
           }
         }
       ]

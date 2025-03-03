@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.OuttakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 // import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.util.TunableNumber;
@@ -48,7 +50,9 @@ public class RobotContainer
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_secondaryDriverXbox =
       new CommandXboxController(OperatorConstants.kSecondaryDriverControllerPort);
- // private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+      
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+  private final OuttakeSubsystem m_outtake = new OuttakeSubsystem();
 
   TunableNumber m_angleP = new TunableNumber("Swerve/PID/ModuleAngle/P", SwerveParser.pidfPropertiesJson.angle.p);
   TunableNumber m_angleD = new TunableNumber("Swerve/PID/ModuleAngle/D", SwerveParser.pidfPropertiesJson.angle.d);
@@ -56,8 +60,6 @@ public class RobotContainer
   TunableNumber m_driveD = new TunableNumber("Swerve/PID/ModuleDrive/D", SwerveParser.pidfPropertiesJson.drive.d);
 
   private SendableChooser<Command> m_autoChooser = null;
-
-  // private final OuttakeSubsystem m_outtake = new OuttakeSubsystem();
 
 
   public RobotContainer() {
@@ -107,7 +109,8 @@ public class RobotContainer
         .withName("testSetAngle");
     addCommandToDashboard(testSetAngle);
 
-    // NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
+    NamedCommands.registerCommand("elevator", m_elevator.setGoal(1)); 
+    NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
     /*
      * Command testDriveToPose = drivebase.runOnce(
      * () -> drivebase.resetOdometry(new Pose2d(0, 0, new Rotation2d()))).andThen(
@@ -130,7 +133,7 @@ public class RobotContainer
         driveFieldOrientedAnglularVelocity);
     m_driverXbox.leftBumper().whileTrue(driveRobotOriented);
 
-   // m_elevator.setDefaultCommand(m_elevator.setGoal(1));
+    // m_elevator.setDefaultCommand(m_elevator.setGoal(1));
     // m_driverXbox.a().whileTrue(m_intake.intakeCommand(0.5));
     // m_driverXbox.b().whileTrue(m_intake.intakeCommand(-0.4));
     // m_driverXbox.y().onTrue(new SequentialCommandGroup(
@@ -139,13 +142,11 @@ public class RobotContainer
     //         m_shoot.shootCommand(-0.7),
     //         m_intake.intakeCommand(1)).withTimeout(2))));
 
-    // m_secondaryDriverXbox.leftBumper().whileTrue(m_climber.climbCommand(1));
-    // m_secondaryDriverXbox.rightBumper().whileTrue(m_climber.climbCommand(-1));
 
-    // m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
-    // m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
+     m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
+     m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
 
-    // m_driverXbox.a().whileTrue(m_outtake.outtake(1));
+     m_driverXbox.x().whileTrue(m_outtake.outtake(1));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
