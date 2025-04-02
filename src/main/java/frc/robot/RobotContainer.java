@@ -111,7 +111,10 @@ public class RobotContainer
         .withName("testSetAngle");
     addCommandToDashboard(testSetAngle);
 
-     NamedCommands.registerCommand("elevator", m_elevator.setGoal(1)); 
+    NamedCommands.registerCommand("elevatorL2", m_elevator.setGoal(35));
+    NamedCommands.registerCommand("outtake!", m_outtake.outtake(-.1).withTimeout(0.75));
+    NamedCommands.registerCommand("elevatorBase", m_elevator.setGoal(6));
+
      // NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
     /*
      * Command testDriveToPose = drivebase.runOnce(
@@ -127,47 +130,38 @@ public class RobotContainer
     // addCommandToDashboard(testDriveToPose);
 
     m_drivebase.setDefaultCommand(
-        // testMotors);
-        // driveRobotOriented);
-        // driveFieldOrientedDirectAngle);
-        // !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle :
-        // driveFieldOrientedDirectAngleSim);
+        
         driveFieldOrientedAnglularVelocity);
     m_driverXbox.leftBumper().whileTrue(driveRobotOriented);
 
-    // m_elevator.setDefaultCommand(m_elevator.setGoal(1));
-    // m_driverXbox.a().whileTrue(m_intake.intakeCommand(0.5));
-    // m_driverXbox.b().whileTrue(m_intake.intakeCommand(-0.4));
-    // m_driverXbox.y().onTrue(new SequentialCommandGroup(
-    //     m_shoot.shootCommand(-0.7).withTimeout(1.5),
-    //     (new ParallelCommandGroup(
-    //         m_shoot.shootCommand(-0.7),
-    //         m_intake.intakeCommand(1)).withTimeout(2))));
-
-  // ELEVATOR VALUES
+   
+  // ELEVATOR COMMANDS
     // outake alignment / L1
     m_secondaryDriverXbox.x().whileTrue(m_elevator.setGoal(24.6));
     // L2
     m_secondaryDriverXbox.y().whileTrue(m_elevator.setGoal(35));
     // base
-    m_secondaryDriverXbox.a().whileTrue(m_elevator.setGoal(4.3));
+    m_secondaryDriverXbox.a().whileTrue(m_elevator.setGoal(6));
     // lower
     m_secondaryDriverXbox.leftBumper().whileTrue(m_elevator.lower());
     // higher
     m_secondaryDriverXbox.rightBumper().whileTrue(m_elevator.higher());
 
 
-  
-    m_secondaryDriverXbox.b().whileTrue(m_outtake.outtake(-0.1));
-    m_secondaryDriverXbox.povDown().whileTrue(m_outtake.outtake(0.075));
+    // outtake / backwards outtake
+    m_secondaryDriverXbox.rightTrigger().whileTrue(m_outtake.outtake(-0.1));
+    m_secondaryDriverXbox.leftTrigger().whileTrue(m_outtake.outtake(0.075));
+
+    // limelight align
+    m_secondaryDriverXbox.b().whileTrue(m_drivebase.limelightDriveCommand());
 
   
 
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-    // m_autoChooser = AutoBuilder.buildAutoChooser();
-    // SmartDashboard.putData("Auto Chooser", m_autoChooser);
+     m_autoChooser = AutoBuilder.buildAutoChooser();
+     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
   private void addCommandToDashboard(Command cmd) {
@@ -205,18 +199,10 @@ public class RobotContainer
   }
 
   public Command getAutonomousCommand() {
-    // return new PathPlannerAuto("test auto");
-    // return m_autoChooser.getSelected();
-    // return drivebase.getAutonomousCommand("small path");
+    
+     return m_autoChooser.getSelected();
 
-    // An example command will be run in autonomous
-    // return Autos.exampleAuto(m_exampleSubsystem);
-        
-    /*return new SequentialCommandGroup(
-      m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(1.2)
-     // drivebase.driveAtSpeed(-5, 0, 0, false).withTimeout(0.5) );*/
-      return m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(0.5);
-     // return null;
+    // return m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(0.5);
 
  }
 
