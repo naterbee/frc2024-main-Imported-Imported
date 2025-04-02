@@ -33,7 +33,6 @@ import swervelib.parser.SwerveParser;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-
 import java.io.File;
 import java.util.function.DoubleSupplier;
 
@@ -51,8 +50,8 @@ public class RobotContainer
   private final CommandXboxController m_secondaryDriverXbox =
       new CommandXboxController(OperatorConstants.kSecondaryDriverControllerPort);
       
-  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-  private final OuttakeSubsystem m_outtake = new OuttakeSubsystem();
+   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+   private final OuttakeSubsystem m_outtake = new OuttakeSubsystem();
 
   TunableNumber m_angleP = new TunableNumber("Swerve/PID/ModuleAngle/P", SwerveParser.pidfPropertiesJson.angle.p);
   TunableNumber m_angleD = new TunableNumber("Swerve/PID/ModuleAngle/D", SwerveParser.pidfPropertiesJson.angle.d);
@@ -79,6 +78,9 @@ public class RobotContainer
 
     Command zeroGyro = m_drivebase.runOnce(() -> m_drivebase.zeroGyro()).withName("zeroGyro");
     addCommandToDashboard(zeroGyro);
+
+    Command zeroEncoder = m_elevator.runOnce(() -> m_elevator.zeroEncoder()).withName("zeroElevator");
+    addCommandToDashboard(zeroEncoder);
 
     Command resetOdometrytoAllianceZero = m_drivebase.runOnce(
         () -> m_drivebase.resetOdometry(m_drivebase.invertIfFieldFlipped(new Pose2d(0, 0, new Rotation2d()))))
@@ -109,8 +111,8 @@ public class RobotContainer
         .withName("testSetAngle");
     addCommandToDashboard(testSetAngle);
 
-    NamedCommands.registerCommand("elevator", m_elevator.setGoal(1)); 
-    NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
+     NamedCommands.registerCommand("elevator", m_elevator.setGoal(1)); 
+     // NamedCommands.registerCommand("outtake", m_outtake.outtake(2));
     /*
      * Command testDriveToPose = drivebase.runOnce(
      * () -> drivebase.resetOdometry(new Pose2d(0, 0, new Rotation2d()))).andThen(
@@ -142,11 +144,25 @@ public class RobotContainer
     //         m_shoot.shootCommand(-0.7),
     //         m_intake.intakeCommand(1)).withTimeout(2))));
 
+  // ELEVATOR VALUES
+    // outake alignment / L1
+    m_secondaryDriverXbox.x().whileTrue(m_elevator.setGoal(24.6));
+    // L2
+    m_secondaryDriverXbox.y().whileTrue(m_elevator.setGoal(35));
+    // base
+    m_secondaryDriverXbox.a().whileTrue(m_elevator.setGoal(4.3));
+    // lower
+    m_secondaryDriverXbox.leftBumper().whileTrue(m_elevator.lower());
+    // higher
+    m_secondaryDriverXbox.rightBumper().whileTrue(m_elevator.higher());
 
-     m_driverXbox.a().whileTrue(m_elevator.setGoal(2));
-     m_driverXbox.b().whileTrue(m_elevator.setGoal(5));
 
-     m_driverXbox.x().whileTrue(m_outtake.outtake(1));
+  
+    m_secondaryDriverXbox.b().whileTrue(m_outtake.outtake(-0.1));
+    m_secondaryDriverXbox.povDown().whileTrue(m_outtake.outtake(0.075));
+
+  
+
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -171,6 +187,8 @@ public class RobotContainer
     SmartDashboard.putNumber("pose/x", m_drivebase.getPose().getX());
     SmartDashboard.putNumber("pose/y", m_drivebase.getPose().getY());
     SmartDashboard.putNumber("pose/z", m_drivebase.getPose().getRotation().getDegrees());
+
+    SmartDashboard.putNumber("elevatorHeight", m_elevator.getHeight());
 
     SmartDashboard.putString("alliance", m_drivebase.isFieldFlipped() ? "RED" : "BLUE");
 
@@ -197,7 +215,8 @@ public class RobotContainer
     /*return new SequentialCommandGroup(
       m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(1.2)
      // drivebase.driveAtSpeed(-5, 0, 0, false).withTimeout(0.5) );*/
-    return m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(2);
+      return m_drivebase.driveAtSpeed(5, 0, 0, false).withTimeout(0.5);
+     // return null;
 
  }
 

@@ -40,8 +40,10 @@ public final class Constants
   public static record TwoIDs(int id1, int id2) {}
 
   public static final class CANDeviceID {
-    public static final TwoIDs kOuttakeMotor = new TwoIDs(100, 200);
-    public static final TwoIDs elevatorMotors = new TwoIDs(40, 41);
+    public static final int kOuttakeMotor1 = 13;
+    public static final int kOuttakeMotor2 = 14;
+    public static final int elevatorMotor1 = 4;
+    public static final int elevatorMotor2 = 15;
     
   }
 
@@ -67,15 +69,15 @@ public final class Constants
   public static final class ElevatorConstants {
 
     public static final double kElevatorkS = 0;
-    public static final double kElevatorkG = 0;
+    public static final double kElevatorkG = 0.3;
     public static final double kElevatorkV = 0;
     public static final double kElevatorkA = 0;
-    public static final double kElevatorGearing = 0;
+    public static final double kElevatorGearing = 1/12;
     public static final double kCarriageMass = 0;
-    public static final double kElevatorDrumRadius = 0;
+    public static final double kElevatorDrumRadius = 0.75;
     public static final double kMinElevatorHeightMeters = 0;
-    public static final double kMaxElevatorHeightMeters = 0;
-    public static final double kElevatorKp = 0;
+    public static final double kMaxElevatorHeightMeters = 0.5;
+    public static final double kElevatorKp = 0.1;
     public static final double kElevatorKi = 0;
     public static final double kElevatorKd = 0;
 
@@ -91,10 +93,10 @@ public final class Constants
     public static final int kSecondaryDriverControllerPort = 1;
 
     // Joystick Deadband
-    public static final double LEFT_X_DEADBAND  = 0.1;
-    public static final double LEFT_Y_DEADBAND  = 0.1;
-    public static final double RIGHT_X_DEADBAND = 0.1;
-    public static final double RIGHT_Y_DEADBAND = 0.1;
+    public static final double LEFT_X_DEADBAND  = 0.075;
+    public static final double LEFT_Y_DEADBAND  = 0.075;
+    public static final double RIGHT_X_DEADBAND = 0.075;
+    public static final double RIGHT_Y_DEADBAND = 0.075;
   }
 
   public static class AdvancedDriveCommandsConstants {

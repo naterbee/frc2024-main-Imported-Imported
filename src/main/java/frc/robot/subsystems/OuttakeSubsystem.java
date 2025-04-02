@@ -23,26 +23,37 @@ public class OuttakeSubsystem extends SubsystemBase {
   private final SparkFlexConfig config;
 
   public OuttakeSubsystem() {
-    m_motor = new SparkFlex(CANDeviceID.kOuttakeMotor.id1(), MotorType.kBrushless);
-    m_motorFollower = new SparkFlex(CANDeviceID.kOuttakeMotor.id2(), MotorType.kBrushless);
+    m_motor = new SparkFlex(CANDeviceID.kOuttakeMotor1, MotorType.kBrushless);
+    m_motorFollower = new SparkFlex(CANDeviceID.kOuttakeMotor2, MotorType.kBrushless);
     config = new SparkFlexConfig();
 
-    config.follow(CANDeviceID.kOuttakeMotor.id1());
-    m_motorFollower.configure(config, null, null);
+    config.follow(CANDeviceID.kOuttakeMotor1, true);
+    // m_motorFollower.configure(config, null, null);
     
   }
 
+// Motor Speed Controls //
+  public void intake () {
+    m_motor.set(-0.15);
+    m_motorFollower.set(0.03);
+  }
 
-  public void intake (double speed) {
-    m_motor.set(speed);
+  public void intakeStraight () {
+    m_motor.set(-0.1);
+    m_motorFollower.set(0.1);
   }
 
   public void stop () {
     m_motor.set(0);
   }
 
-  public Command outtake(double speed) {
-    return runEnd(() -> { intake(speed); },
+  public Command outtake() {
+    return runEnd(() -> { intake(); },
+                  () -> { stop();});
+  }
+
+  public Command outtakeStraight() {
+    return runEnd(() -> { intakeStraight(); },
                   () -> { stop();});
   }
 
