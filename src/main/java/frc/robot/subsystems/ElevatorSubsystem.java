@@ -162,6 +162,7 @@ public class ElevatorSubsystem extends SubsystemBase
                   () -> { stop();});
   }
 
+
    public void reachGoal(double goal)
   {
     m_controller.setReference(goal, ControlType.kPosition);
@@ -176,6 +177,14 @@ public class ElevatorSubsystem extends SubsystemBase
       
 
 }
+
+  public void lowerElevator() {
+    m_controller.setReference(m_encoder.getPosition()-0.5, ControlType.kPosition);
+  }
+
+  public void higherElevator() {
+    m_controller.setReference(m_encoder.getPosition()+1, ControlType.kPosition);
+  }
 
 
   /**
@@ -212,6 +221,14 @@ public class ElevatorSubsystem extends SubsystemBase
   public Command setGoal(double goal)
   {
     return run(() -> reachGoal(goal));
+  }
+
+  public Command lower() {
+    return run(() -> lowerElevator());
+  }
+
+  public Command higher() {
+    return run(() -> higherElevator());
   }
 
   /**

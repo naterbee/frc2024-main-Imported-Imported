@@ -31,12 +31,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
-import frc.robot.subsystems.Vision.Cameras;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.robot.util.CANSparkMaxSendableAdapter;
-import frc.robot.subsystems.Vision;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.io.File;
@@ -81,7 +80,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public final SwerveDrive swerveDrive;
   private final boolean visionDriveTest = false;
-  private Vision vision;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -114,10 +113,7 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
 
-    if (visionDriveTest) {
-      setupPhotonVision();
-      swerveDrive.stopOdometryThread();
-    }
+   
      setupPathPlanner();
 
     // 0 to 3. front left -> front right -> back left -> back right (from SverveModule.moduleNumber documentation)
@@ -171,10 +167,6 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose2d invertIfFieldFlipped(Pose2d pose) {
     if (isFieldFlipped()) return FlippingUtil.flipFieldPose(pose);
     return pose;
-  }
-
-  public void setupPhotonVision() {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
   /**
@@ -249,25 +241,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   }
 
-  public Command aimAtTarget(Cameras camera)
-  {
-
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
-  }
-
+ 
 
   // public void setupPathPlanner()
   // { 
@@ -375,15 +349,41 @@ public class SwerveSubsystem extends SubsystemBase
                                            DoubleSupplier z) {
     return run(() -> {
       // Make the robot move
-      swerveDrive.drive(new Translation2d(x.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                                          y.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
-                        z.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
+      swerveDrive.drive(new Translation2d(x.getAsDouble() * swerveDrive.getMaximumChassisVelocity()*0.3,
+                                          y.getAsDouble() * swerveDrive.getMaximumChassisVelocity()*0.3),
+                        z.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()*0.3,
                         // Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumAngularVelocity(),
                         false,
                         false);
     });    
   }
 
+  double limelight_aim_proportional() {
+    double kP = .3;
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight")*kP;
+    targetingAngularVelocity *= swerveDrive.getMaximumChassisAngularVelocity();
+    targetingAngularVelocity *= -1.0;
+    return targetingAngularVelocity;
+  }
+
+  double limelight_range_proportional() {
+    double kP = .3;
+    double targetingForwardSpeed = LimelightHelpers.getTY("limelight")*kP;
+    targetingForwardSpeed *= swerveDrive.getMaximumChassisVelocity();
+    targetingForwardSpeed *= -1.0;
+    return targetingForwardSpeed;
+  }
+
+  public Command limelightDriveCommand() {
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(limelight_range_proportional(),
+                                         swerveDrive.getMaximumChassisVelocity()),
+                        limelight_aim_proportional(),
+                        // Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumAngularVelocity(),
+                        false,
+                        false);
+    });    
+  }
   /**
    * Command to drive the robot using translative values and heading as a setpoint.
    *
@@ -448,13 +448,13 @@ public class SwerveSubsystem extends SubsystemBase
     return run(() -> {
       int multiplier = isFieldFlipped() ? -1 : 1;
       if (slow.getAsBoolean()) {
-        multiplier *= 0.75;
+        multiplier *= 0.5;
       }
       // Make the robot move
       swerveDrive.drive(new Translation2d(
-        multiplier * Math.pow(translationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisVelocity(),
-        multiplier * Math.pow(translationY.getAsDouble(), 3) * swerveDrive.getMaximumChassisVelocity()),
-        multiplier * Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
+        multiplier * Math.pow(translationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisVelocity()*0.75,
+        multiplier * Math.pow(translationY.getAsDouble(), 3) * swerveDrive.getMaximumChassisVelocity()*.75),
+        multiplier * Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity()*.75,
         true,
         false);
     });
@@ -504,15 +504,6 @@ public class SwerveSubsystem extends SubsystemBase
   public void drive(ChassisSpeeds velocity)
   {
     swerveDrive.drive(velocity);
-  }
-
-  @Override
-  public void periodic()
-  {
-    if (visionDriveTest) {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-    }
   }
 
   @Override
